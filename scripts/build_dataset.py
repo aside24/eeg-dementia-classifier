@@ -1,17 +1,17 @@
 """
-Batch-process multiple subjects: preprocessing + feature extraction, with
-per-subject error handling so one failure doesn't lose progress on the rest.
+Batch process multiple subjects: preprocessing + feature extraction, with
+per subject error handling 
 
 Usage:
     python scripts/build_dataset.py
 
 Reads data/raw/participants.tsv for group labels, processes every subject
 folder found under data/raw/ that has a corresponding EEG file, and writes
-the resulting feature table to data/processed/features.csv.
+the resulting feature table to data/processed/features.csv
 
-Progress is saved incrementally (after every subject) so an interruption
-partway through does not lose already-completed work — simply re-running
-picks up from an empty output file, but completed per-subject logs make it
+Progress is saved after every subject so an interruption
+partway through does not lose already-completed work. running it again
+picks up from an empty output file, but there are completed persubject logs make it
 easy to see what succeeded before a crash.
 """
 
@@ -21,8 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 
-# Make src/ importable when running this script directly (not needed if the
-# project is pip-installed in editable mode, but kept for robustness).
+# Make src/ importable when running this directly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from eeg_dementia.preprocessing import preprocess_subject
@@ -35,7 +34,7 @@ OUTPUT_CSV = PROCESSED_DIR / "features.csv"
 
 def get_available_subjects():
     """
-    Cross-reference which subjects have both a raw EEG file downloaded AND a
+    Cross reference which subjects have both a raw EEG file downloaded AND a
     group label in participants.tsv. Returns {subject_id: group_label}.
     """
     participants = pd.read_csv(RAW_DIR / "participants.tsv", sep="\t")
@@ -77,7 +76,7 @@ def main():
             print(f"FAILED ({elapsed:.0f}s) — {type(e).__name__}: {e}")
             failures.append({"subject_id": sub_id, "group": group, "error": str(e)})
 
-        # Save progress after every subject, not just at the end — an
+        # Save progress after every subject, not just at the end 
         # interruption partway through still leaves a usable partial dataset.
         if rows:
             pd.DataFrame(rows).to_csv(OUTPUT_CSV, index=False)
