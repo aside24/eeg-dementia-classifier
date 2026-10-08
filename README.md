@@ -71,7 +71,7 @@ python scripts/build_dataset.py
 # Then open notebooks/04_classification.ipynb to reproduce the classification results
 ```
 
-## Design decisions worth knowing
+## Design decisions 
 
 - **Relative, not absolute, band power.** Absolute EEG power is confounded by non neural factors (skull thickness, electrode contact, cap fit) that vary subject to subject. Switching to relative power (each band as a fraction of that channel's own total power) revealed a much cleaner three way separation than absolute power showed. See the full write up for the investigation that led to this choice.
 - **Subject level, not epoch level, train/test splitting.** Each subject contributes one row to the final feature table (band power averaged across that subject's own clean epochs), which prevents a subject's data from leaking across the train and test.
