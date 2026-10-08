@@ -1,0 +1,27 @@
+[project]
+name = "eeg-dementia"
+version = "0.1.0"
+description = "Resting-state EEG spectral analysis and Random Forest classification of Alzheimer's disease and frontotemporal dementia vs. healthy controls (OpenNeuro ds004504)."
+requires-python = ">=3.10"
+dependencies = [
+    "mne>=1.6",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyter>=1.0",
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
