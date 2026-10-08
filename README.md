@@ -13,9 +13,9 @@ I built a pipeline that takes raw, 19 channel resting state EEGs, extracts spect
 | Random Forest, 95 features | AD / FTD / CN | **62.5%** | ~41% |
 | Random Forest, 95 features | Dementia / Control (binary) | **77.3%** | ~67% |
 
-The 3 class model distinguishes healthy controls well (86% recall) and Alzheimer's reasonably well (72% recall), but struggles specifically with FTD (17% recall), a weakness that matches literature describing FTD's EEG signature as less consistent than Alzheimer's slowing pattern. The binary reframing (dementia vs. healthy) trades diagnostic granularity for a cleaner separation.
+The 3 class model distinguishes healthy controls well (86% recall) and Alzheimer's reasonably well (72% recall), but struggles specifically with FTD (17% recall), a weakness that matches literature describing FTD's EEG signature as less consistent than Alzheimer's slowing pattern. The binary reframing (dementia vs. healthy) trades specificity in the diagnosis for accuracy.
 
-A single subject spectral comparison illustrates the underlying effect: a healthy control subject's EEG is dominated by alpha power (50.6% of total), while both an Alzheimer's and an FTD subject show power concentrated almost entirely in delta (~70%), with alpha nearly absent, visible directly in the power spectral density before any classifier is involved.
+A single subject spectral comparison shows that a healthy control subject's EEG is dominated by alpha power (50.6% of total), while both an Alzheimer's and an FTD subject show power concentrated almost entirely in delta (~70%), with alpha nearly absent, visible directly in the power spectral density before any classifier is involved.
 
 ## Pipeline
 
@@ -32,7 +32,7 @@ Raw EEG (.set)
   → Random Forest classification
 ```
 
-Every step's parameters were chosen and validated against the data itself. See the [full write up](https://docs.google.com/document/d/1XijgZJPhEBfPMK6wvMmIFlJXkWANYW_B4j1-LF1HFpo/edit?usp=sharing) for the rationale behind each choice.
+Every step's parameters were chosen and validated against the data itself. See the [full write up](https://docs.google.com/document/d/1XijgZJPhEBfPMK6wvMmIFlJXkWANYW_B4j1-LF1HFpo/edit?usp=sharing) for further explanation.
 
 ## Repository structure
 
@@ -76,12 +76,12 @@ python scripts/build_dataset.py
 - **Relative, not absolute, band power.** Absolute EEG power is confounded by non neural factors (skull thickness, electrode contact, cap fit) that vary subject to subject. Switching to relative power (each band as a fraction of that channel's own total power) revealed a much cleaner three way separation than absolute power showed. See the full write up for the investigation that led to this choice.
 - **Subject level, not epoch level, train/test splitting.** Each subject contributes one row to the final feature table (band power averaged across that subject's own clean epochs), which prevents a subject's data from leaking across the train and test.
 - **A manual fallback for ICA artifact detection.** MNE's automatic find_bads_eog() missed a component for one subject because a second, moderately correlated component compressed the relevant z score just under the automatic threshold. The pipeline includes a fallback for this.
-- **Per subject error isolation in batch processing.** scripts/build_dataset.py wraps each subject's processing in its own try/except with incremental saving, so one problematic subject can't crash a time intensive batch run.
+- **Per subject error isolation in batch processing.** scripts/build_dataset.py wraps each subject's processing in its own try/except with incremental saving, so one error prone subject can't crash a time intensive batch run.
 
 ## Limitations
 
-- **Sample size.** 88 subjects against 95 features is a small sample regime for a 3 class problem. Several attempts to improve on the baseline model (constraining tree complexity, narrowing to literature motivated feature subsets) did not outperform it.
-- **No dedicated muscle artifact removal.** The ICA step targets eye related artifacts only. Some residual high frequency (beta/gamma) power in frontal/temporal channels is likely muscle related (EMG) rather than neural, and was not specifically corrected for.
+- **Sample size.** 88 subjects against 95 features is small for a 3 class problem. Several attempts to improve the baseline model (constraining tree complexity, narrowing to feature subsets) did not outperform it.
+- **No dedicated muscle artifact removal.** The ICA step targets eye related artifacts only. Some residual high frequency (beta/gamma) power in frontal/temporal channels is likely muscle related (EMG) rather than neural, and was not accounted for.
 - **No true EOG channel.** This dataset has no dedicated eye movement sensor. Fp1 (the frontopolar channel closest to the eyes) was used as a proxy.
 - **FTD classification is weak and inconsistent** in the 3 class model, reflecting a less consistent EEG signature for FTD relative to Alzheimer's.
 
